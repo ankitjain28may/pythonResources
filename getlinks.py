@@ -7,11 +7,14 @@ import requests
 
 url = input("Enter a website to extract the URL's from: ")
 
-r  = requests.get("http://" +url)
-
+r  = requests.get("http://"+url)
 data = r.text
 
-soup = BeautifulSoup(data)
-
+soup = BeautifulSoup(data,'html.parser')
+f = open("test.txt","a+")
+i=0;
 for link in soup.find_all('a'):
-    print(link.get('href'))
+    f.write(link.get('href')+"\n")
+f.close()
+
+# Input the url and print all the links on that page
