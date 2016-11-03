@@ -17,3 +17,6 @@ All the python related scripts are being listed here.
 
   7- [Scrape the customer reviews from Snapdeal](https://github.com/ankitjain28may/ScrapeSnapdeal)
 
+  8- [Post on your FB with python](https://github.com/ankitjain28may/FbPostUsingPython)
+
+
