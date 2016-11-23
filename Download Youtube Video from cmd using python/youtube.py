@@ -5,6 +5,7 @@ import json
 import time
 import selenium
 from selenium import webdriver
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.common.keys import Keys
 
 
@@ -17,13 +18,13 @@ try:
 
     driver = webdriver.PhantomJS(executable_path=r'C:\Users\ankit\Downloads\phantomjs-2.1.1-windows (1)\phantomjs-2.1.1-windows\bin\phantomjs.exe')
     driver.set_window_size(1120, 550)
-    driver.get("http://en.savefrom.net")
 
     # FireFox
 
-    # driver = webdriver.Firefox()
-    # driver.get("http://en.savefrom.net")
+    # binary = FirefoxBinary('C:\Program Files (x86)\Mozilla Firefox\Firefox.exe')
+    # driver = webdriver.Firefox(firefox_binary=binary)
 
+    driver.get("http://en.savefrom.net")
     shURL = driver.find_element_by_xpath('//input[@id="sf_url" and @type="text"]')
     shURL.send_keys(url)
     time.sleep(2)
