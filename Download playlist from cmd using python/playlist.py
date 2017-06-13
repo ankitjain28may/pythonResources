@@ -157,8 +157,10 @@ def main():
 
         # FireFox
 
-        # binary = FirefoxBinary('C:\Program Files (x86)\Mozilla Firefox\Firefox.exe')
+        # binary = FirefoxBinary(
+        #     'C:\Program Files (x86)\Mozilla Firefox\Firefox.exe')
         # driver = webdriver.Firefox(firefox_binary=binary)
+        # driver.set_window_size(1120, 550)
 
         driver.get(url)
         WebDriverWait(driver, 10000).until(
@@ -190,14 +192,31 @@ def main():
             _url = prefix + _url.get("href")
 
             driver.get("http://en.savefrom.net")
+            WebDriverWait(driver, 10000).until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "#sf_url")
+                )
+            )
             shURL = driver.find_element_by_xpath(
                 '//input[@id="sf_url" and @type="text"]')
             shURL.send_keys(_url)
-            sleep(2)
+
+            WebDriverWait(driver, 10000).until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "#sf_submit")
+                )
+            )
             shSubmit = driver.find_element_by_xpath(
                 '//button[@id="sf_submit" and @class="submit" and @name="sf_submit"]')
             shSubmit.click()
-            sleep(10)
+
+            WebDriverWait(driver, 10000).until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR,
+                     ".link.link-download.subname.ga_track_events.download-icon")
+                )
+            )
+            # sleep(10)
             soupInner = BeautifulSoup(driver.page_source, 'html.parser')
             click = soupInner.find(
                 "a", class_="link link-download subname ga_track_events download-icon")
