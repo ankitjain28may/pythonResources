@@ -128,6 +128,8 @@ def main():
     prefix = "https://www.youtube.com"
     opts = ''
     args = ''
+    start = 0
+    end = 0
     path = "playlist"
     # url = input("Enter the Youtube-url\n")
     # name = input("Enter the name for the video\n")
@@ -138,6 +140,8 @@ def main():
                         help="Complete download link of the playlist", type=str)
     parser.add_argument('-l', '--list', nargs='?',
                         help="List id of the playlist", type=str)
+    parser.add_argument('-s', '--start', nargs='?',
+                        help="Start no. of playlist", type=int)
     args = parser.parse_args()
 
     if args.url:
@@ -146,6 +150,9 @@ def main():
         url = "https://www.youtube.com/playlist?list=" + args.list
     else:
         print(parser.parse_args(['--help']))
+
+    if args.start:
+        start = args.start
 
     try:
 
@@ -184,6 +191,9 @@ def main():
             os.system('mkdir %s' % path)
 
         for i, (_url) in enumerate(_urls):
+            if i + 1 < start:
+                continue
+
             _name = _url.string.replace('\n', '').replace(
                 ' ', '').replace(',', '').replace('.', '')
 
