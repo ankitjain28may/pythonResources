@@ -142,6 +142,8 @@ def main():
                         help="List id of the playlist", type=str)
     parser.add_argument('-s', '--start', nargs='?',
                         help="Start no. of playlist", type=int)
+    parser.add_argument('-e', '--end', nargs='?',
+                        help="End no. of playlist", type=int)
     args = parser.parse_args()
 
     if args.url:
@@ -152,7 +154,9 @@ def main():
         print(parser.parse_args(['--help']))
 
     if args.start:
-        start = args.start
+        start = args.start - 1
+    if args.end:
+        end = args.end
 
     try:
 
@@ -178,24 +182,26 @@ def main():
 
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         path = soup.find(
-            "h1", class_="pl-header-title").string.replace('\n', '').replace(' ', '').replace(',', '').replace('.', '')
+            "h1", class_="pl-header-title").string.replace('\n', '').replace(' ', '').replace(',', '').replace('.', '').replace(':', '')
 
         _urls = soup.find_all(
             "a", class_="pl-video-title-link")
 
         totalVideos = len(_urls)
+        if end == 0:
+            end = totalVideos
 
         print("There are total of " + str(totalVideos) + " Videos in the playlist")
 
         if not os.path.exists(path):
             os.system('mkdir %s' % path)
 
-        for i, (_url) in enumerate(_urls):
-            if i + 1 < start:
-                continue
+        for i in range(start, end):
+
+            _url = _urls[i]
 
             _name = _url.string.replace('\n', '').replace(
-                ' ', '').replace(',', '').replace('.', '')
+                ' ', '').replace(',', '').replace('.', '').replace(':', '')
 
             _name += '.mp4'
 
