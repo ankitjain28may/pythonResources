@@ -21,4 +21,4 @@ All the python related scripts are being listed here.
 
   9- [Download Youtube Playlist](https://github.com/ankitjain28may/pythonResources/tree/master/Download%20playlist%20from%20cmd%20using%20python)
 
-  10- [Play Youtube Playlist](https://github.com/ankitjain28may/pythonResources/tree/master/Play%20Youtube%20Playlist)
+  10- [Play Youtube Playlist](Play%20Youtube%20Playlist/)
