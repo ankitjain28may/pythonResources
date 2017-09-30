@@ -14,6 +14,7 @@ import subprocess
 import shlex
 import time
 import json
+from select import select
 from socket import error as socket_error
 import tty
 try:
@@ -21,10 +22,12 @@ try:
 except ImportError:
 	DEVNULL = open(os.devnull, 'wb')
 
+# Transform message into JSON
 def compose_message(message):
 	data = json.dumps(message, separators=",:")
 	return data.encode("utf8", "strict") + b"\n"
 
+# Gets info from a video
 def get_name(video):
 	html = requests.get(video).text
 	for name in re.findall('''title":["'](.[^"']+)["']''', html, re.I):
@@ -50,7 +53,14 @@ def play_music(list):
 
 		print(get_name(list[i]))
 		while 1:
-			ch = sys.stdin.read(1)
+			ch=0
+			rlist, _, _ = select([sys.stdin], [], [], 0.1)
+			if rlist:
+				ch = sys.stdin.read(1)
+			elif proc.poll() is not None:
+				break
+			else:
+				continue
 			if ch == 'q':
 				soc.send(compose_message({"command": ["quit"]}))
 				proc.kill()
@@ -65,17 +75,20 @@ def play_music(list):
 				soc.send(compose_message({"command": ["seek", "5"]}))
 			elif ch in 'n':
 				soc.send(compose_message({"command": ["quit"]}))
+				proc.kill()
+				soc.shutdown(socket.SHUT_WR)
+				soc.close()
 				break
 			elif ch in 'b':
 				soc.send(compose_message({"command": ["quit"]}))
+				proc.kill()
+				soc.shutdown(socket.SHUT_WR)
+				soc.close()
 				i = i-2
 				break
 			elif ch in '\ ':
 				soc.send(compose_message({"command": ["cycle", "pause"]}))
 
-		proc.kill()
-		soc.shutdown(socket.SHUT_WR)
-		soc.close()
 		os.remove("/tmp/mpvsocket")
 		i = i + 1
 		if i < 0:
@@ -112,16 +125,18 @@ def main(argv):
 	if url == 0:
 		url = raw_input("Please enter playlist url: ")
 
-	print("Controls:")
+	print("\nControls:")
 	print("  space: play/pause")
 	print("  j/l: backward/forward")
 	print("  n: next song")
 	print("  b: previous song")
-	print("  q: to exit")
+	print("  q: to exit\n\n")
 
 	html = get_webpage(url)
 	id_list = get_videos(html)
 
+	if len(id_list) == 0:
+		sys.exit(2l)
 	play_music(id_list)
 
 
