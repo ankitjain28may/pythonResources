@@ -10,9 +10,9 @@ from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.common.keys import Keys
 
-url = input("Enter the Youtube-url\n")
-name = input("Enter the name for the video\n")
-name=name+".mp4"
+url = input("Enter the URL\n")
+name = input("Enter the video's name\n")
+name += ".mp4"
 n = name.split(' ')
 name = "_".join(n)
 print(name)
