@@ -8,7 +8,7 @@ installs = [
     ]
 
 
-print("Wait for the installations, Its in progress..!!!")
+print("Wait for the installations, work in progress..!!!")
 
 # Run all the commands one by one
 for install in installs:
