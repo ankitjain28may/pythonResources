@@ -41,12 +41,12 @@ def play_music(list):
 	i = 0
 	while 1:
 		proc = subprocess.Popen(shlex.split("mpv " + list[i] + " --no-video\
-					--quiet --input-ipc-server=/tmp/mpvsocket"), stdout=DEVNULL)
+					--quiet --input-ipc-server=.mpvsocket"), stdout=DEVNULL)
 		soc = 0
 		while 1:
 			try:
 				soc = socket.socket(socket.AF_UNIX)
-				soc.connect("/tmp/mpvsocket")
+				soc.connect(".mpvsocket")
 				break
 			except socket_error:
 				continue
@@ -66,7 +66,7 @@ def play_music(list):
 				proc.kill()
 				soc.shutdown(socket.SHUT_WR)
 				soc.close()
-				os.remove("/tmp/mpvsocket")
+				os.remove(".mpvsocket")
 				sys.exit()
 				break
 			elif ch in 'l':
@@ -89,7 +89,7 @@ def play_music(list):
 			elif ch in '\ ':
 				soc.send(compose_message({"command": ["cycle", "pause"]}))
 
-		os.remove("/tmp/mpvsocket")
+		os.remove(".mpvsocket")
 		i = i + 1
 		if i < 0:
 			i = len(list) - 1
