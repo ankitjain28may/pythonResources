@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import selenium
+import argparse
 from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.common.keys import Keys
@@ -115,21 +116,35 @@ speedType = ''
 sizeType = ''
 flag = 0
 
+
+
+
 url = input("Enter the Youtube-url\n")
 name = input("Enter the name for the video\n")
 name = name+".mp4"
 try:
 
-    # Phantom JS
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-d", "--driver", type=str, default="phantomjs",
+        help="which driver to use [option: phantomjs, firefox, chrome]")
 
-    driver = webdriver.PhantomJS(
-        executable_path=r'C:\Users\ankit\Downloads\phantomjs-2.1.1-windows (1)\phantomjs-2.1.1-windows\bin\phantomjs.exe')
+    args = vars(ap.parse_args())
+    choice = args["driver"]
+
+    driver = ""
+    if choice == "firefox":
+        binary = FirefoxBinary('firefox')
+        driver = webdriver.Firefox(firefox_binary=binary)
+    elif choice == "chrome":
+        driver = webdriver.Chrome();
+    elif choice == "phantomjs":
+        driver = webdriver.PhantomJS(
+            executable_path=r'phantomjs')
+    else:
+        print("Invalid Choice");
+        sys.exit(1);
+
     driver.set_window_size(1120, 550)
-
-    # FireFox
-
-    # binary = FirefoxBinary('C:\Program Files (x86)\Mozilla Firefox\Firefox.exe')
-    # driver = webdriver.Firefox(firefox_binary=binary)
 
     driver.get("http://en.savefrom.net")
     shURL = driver.find_element_by_xpath(
