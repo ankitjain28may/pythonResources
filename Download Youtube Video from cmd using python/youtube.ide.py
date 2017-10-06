@@ -5,6 +5,7 @@ import requests
 import urllib.request
 import json
 import time
+import argparse
 import selenium
 from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
@@ -18,15 +19,27 @@ name = "_".join(n)
 print(name)
 try:
 
-    # Phantom JS
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-d", "--driver", type=str, default="phantomjs",
+        help="which driver to use [option: phantomjs, firefox, chrome]")
 
-    driver = webdriver.PhantomJS(executable_path=r'C:\Users\ankit\Downloads\phantomjs-2.1.1-windows (1)\phantomjs-2.1.1-windows\bin\phantomjs.exe')
+    args = vars(ap.parse_args())
+    choice = args["driver"]
+
+    driver = ""
+    if choice == "firefox":
+        binary = FirefoxBinary('firefox')
+        driver = webdriver.Firefox(firefox_binary=binary)
+    elif choice == "chrome":
+        driver = webdriver.Chrome();
+    elif choice == "phantomjs":
+        driver = webdriver.PhantomJS(
+            executable_path=r'phantomjs')
+    else:
+        print("Invalid Choice");
+        sys.exit(1);
+
     driver.set_window_size(1120, 550)
-
-    # FireFox
-
-    # binary = FirefoxBinary('C:\Program Files (x86)\Mozilla Firefox\Firefox.exe')
-    # driver = webdriver.Firefox(firefox_binary=binary)
 
     driver.get("http://en.savefrom.net")
     shURL = driver.find_element_by_xpath('//input[@id="sf_url" and @type="text"]')
@@ -40,10 +53,6 @@ try:
     url_parse = click.get("href")
     driver.quit()
     path = os.getcwd()
-    # print("Downloading Starts..\n")
-    # print(url_parse)
-    # urllib.request.urlretrieve(url_parse, name)
-
 
     installs = [
         'idman.exe /n /d ' + '"' + url_parse + '"' + ' /p ' + '"' + path + '"' + ' /f ' + '"' + name + '"' + ' /q',
