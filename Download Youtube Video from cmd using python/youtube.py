@@ -7,7 +7,6 @@ from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.common.keys import Keys
 from urllib.request import urlopen
-from getopt import GetoptError, getopt
 import sys
 import os
 from getpass import getuser
