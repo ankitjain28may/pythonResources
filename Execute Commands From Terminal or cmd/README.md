@@ -1,4 +1,5 @@
 #  Execute Commands From Terminal or cmd
+
   This script helps you to execute multiple CLI commands directly using single script.
 
 ## Requirements
