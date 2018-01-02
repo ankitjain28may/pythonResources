@@ -131,6 +131,8 @@ def main():
     start = 0
     end = 0
     path = "playlist"
+    driver = ""
+    system = sys.platform
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', '--url', nargs='?',
@@ -142,7 +144,7 @@ def main():
     parser.add_argument('-e', '--end', nargs='?',
                         help="End no. of playlist", type=int)
     parser.add_argument("-d", "--driver", type=str, default="phantomjs",
-            help="which driver to use [option: phantomjs, firefox, chrome]")
+                        help="which driver to use [option: phantomjs, firefox, chrome]")
 
     args = parser.parse_args()
 
@@ -161,17 +163,30 @@ def main():
     try:
 
         choice = args.driver
-        driver = ""
-        if choice == "firefox":
-            binary = FirefoxBinary('firefox')
-            driver = webdriver.Firefox(firefox_binary=binary)
-        elif choice == "chrome":
-            driver = webdriver.Chrome();
-        elif choice == "phantomjs":
-            driver = webdriver.PhantomJS()
-        else:
-            print("Invalid Choice");
-            sys.exit(1);
+        if system == "linux" or system == "linux2":
+            if choice == "firefox":
+                binary = FirefoxBinary('firefox')
+                driver = webdriver.Firefox(firefox_binary=binary)
+            elif choice == "chrome":
+                driver = webdriver.Chrome()
+            elif choice == "phantomjs":
+                driver = webdriver.PhantomJS()
+            else:
+                print("Invalid Choice")
+                sys.exit(1)
+
+        elif system == "win32":
+            if choice == "firefox":
+                binary = FirefoxBinary('firefox.exe')
+                driver = webdriver.Firefox(firefox_binary=binary)
+            elif choice == "chrome":
+                driver = webdriver.Chrome('chromedriver.exe')
+            elif choice == "phantomjs":
+                driver = webdriver.PhantomJS(
+                    executable_path=r'phantomjs.exe')
+            else:
+                print("Invalid Choice")
+                sys.exit(1)
 
         driver.set_window_size(1120, 550)
 
@@ -184,8 +199,8 @@ def main():
 
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         path = soup.find(
-            "a", class_="yt-formatted-string").string
-
+            "a", class_="yt-formatted-string").string.replace('|', '-')
+        print(path)
         _urls = soup.find_all(
             "ytd-playlist-video-renderer", class_="ytd-playlist-video-list-renderer")
 
@@ -195,15 +210,17 @@ def main():
 
         print("There are total of " + str(totalVideos) + " Videos in the playlist")
 
-        if not os.path.exists(r'"'+path+'"'):
-            os.system('mkdir %s' % r'"'+path+'"')
+        if not os.path.exists(r'"' + path + '"'):
+            os.system('mkdir %s' % r'"' + path + '"')
+        # path = os.path.abspath(path)
+        # print(path)
 
         for i in range(start, end):
 
             _url = _urls[i]
 
             _name = _url.find("h3").find("span").string.replace('\n', '').replace(
-                '  ', '')
+                '  ', '').replace('|', '-')
             _name += '.mp4'
 
             _url = prefix + _url.find("a").get("href")
@@ -239,7 +256,7 @@ def main():
                 "a", class_="link link-download subname ga_track_events download-icon")
             url_parse = click.get("href")
             print(str(i + 1) + "- Downloading " + _name)
-            with open(path + "//" + _name, 'wb') as out_file:
+            with open(path + "\\" + _name, 'wb') as out_file:
                 with urlopen(url_parse) as fp:
                     info = fp.info()
                     if 'Content-Length' in info:
@@ -262,9 +279,9 @@ def main():
             print("\n")
             print("Successfully download " + _name)
             sys.stdout.write("\a")
+        driver.quit()
     except Exception as e:
         print(e)
-    driver.quit()
 
 
 if __name__ == '__main__':
