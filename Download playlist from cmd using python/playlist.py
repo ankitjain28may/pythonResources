@@ -131,12 +131,9 @@ def main():
     start = 0
     end = 0
     path = "playlist"
-    # url = input("Enter the Youtube-url\n")
-    # name = input("Enter the name for the video\n")
-    # name = name + ".mp4"
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--url', nargs='?',
+    parser.add_argument('-u', '--url', nargs='?',
                         help="Complete download link of the playlist", type=str)
     parser.add_argument('-l', '--list', nargs='?',
                         help="List id of the playlist", type=str)
@@ -144,6 +141,9 @@ def main():
                         help="Start no. of playlist", type=int)
     parser.add_argument('-e', '--end', nargs='?',
                         help="End no. of playlist", type=int)
+    parser.add_argument("-d", "--driver", type=str, default="phantomjs",
+            help="which driver to use [option: phantomjs, firefox, chrome]")
+
     args = parser.parse_args()
 
     if args.url:
@@ -160,32 +160,34 @@ def main():
 
     try:
 
-        # Phantom JS
+        choice = args.driver
+        driver = ""
+        if choice == "firefox":
+            binary = FirefoxBinary('firefox')
+            driver = webdriver.Firefox(firefox_binary=binary)
+        elif choice == "chrome":
+            driver = webdriver.Chrome();
+        elif choice == "phantomjs":
+            driver = webdriver.PhantomJS()
+        else:
+            print("Invalid Choice");
+            sys.exit(1);
 
-        driver = webdriver.PhantomJS(
-            executable_path=r'C:\Users\ankit\Downloads\phantomjs-2.1.1-windows (1)\phantomjs-2.1.1-windows\bin\phantomjs.exe')
         driver.set_window_size(1120, 550)
-
-        # FireFox
-
-        # binary = FirefoxBinary(
-        #     'C:\Program Files (x86)\Mozilla Firefox\Firefox.exe')
-        # driver = webdriver.Firefox(firefox_binary=binary)
-        # driver.set_window_size(1120, 550)
 
         driver.get(url)
         WebDriverWait(driver, 10000).until(
             EC.presence_of_element_located(
-                (By.CSS_SELECTOR, ".pl-header-title")
+                (By.CSS_SELECTOR, ".yt-formatted-string")
             )
         )
 
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         path = soup.find(
-            "h1", class_="pl-header-title").string.replace('\n', '').replace(' ', '').replace(',', '').replace('.', '').replace(':', '')
+            "a", class_="yt-formatted-string").string
 
         _urls = soup.find_all(
-            "a", class_="pl-video-title-link")
+            "ytd-playlist-video-renderer", class_="ytd-playlist-video-list-renderer")
 
         totalVideos = len(_urls)
         if end == 0:
@@ -193,21 +195,20 @@ def main():
 
         print("There are total of " + str(totalVideos) + " Videos in the playlist")
 
-        if not os.path.exists(path):
-            os.system('mkdir %s' % path)
+        if not os.path.exists(r'"'+path+'"'):
+            os.system('mkdir %s' % r'"'+path+'"')
 
         for i in range(start, end):
 
             _url = _urls[i]
 
-            _name = _url.string.replace('\n', '').replace(
-                ' ', '').replace(',', '').replace('.', '').replace(':', '')
-
+            _name = _url.find("h3").find("span").string.replace('\n', '').replace(
+                '  ', '')
             _name += '.mp4'
 
-            _url = prefix + _url.get("href")
-
-            driver.get("http://en.savefrom.net")
+            _url = prefix + _url.find("a").get("href")
+            driver.get("https://en.savefrom.net")
+            sleep(1)
             WebDriverWait(driver, 10000).until(
                 EC.presence_of_element_located(
                     (By.CSS_SELECTOR, "#sf_url")
@@ -238,7 +239,7 @@ def main():
                 "a", class_="link link-download subname ga_track_events download-icon")
             url_parse = click.get("href")
             print(str(i + 1) + "- Downloading " + _name)
-            with open(path + "\\" + _name, 'wb') as out_file:
+            with open(path + "//" + _name, 'wb') as out_file:
                 with urlopen(url_parse) as fp:
                     info = fp.info()
                     if 'Content-Length' in info:
