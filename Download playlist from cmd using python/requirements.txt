@@ -1,0 +1,9 @@
+beautifulsoup4 >=4.5.1
+colorama>=0.3.7
+argparse
+requests==2.10.0
+selenium==3.4.3
+urllib
+subprocess
+requests
+json
