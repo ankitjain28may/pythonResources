@@ -2,7 +2,7 @@ colorama>=0.3.7
 bs4>=3.5.0
 json
 argparse
-requests==2.10.0
+requests==2.20.0
 selenium==3.4.3
 urllib
 subprocess
